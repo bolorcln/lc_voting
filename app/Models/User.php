@@ -42,11 +42,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function ideas()
-    {
-        return $this->hasMany(Idea::class);
-    }
-
+    /**
+     * Attributes
+     */
     public function getAvatarAttribute()
     {
         $firstCharacter = $this->email[0];
@@ -60,5 +58,18 @@ class User extends Authenticatable
             . '&d=https://s3.amazonaws.com/laracasts/images/forum/avatars/default-avatar-'
             . $integer
             . '.png';
+    }
+
+    /**
+     * Relationships
+     */
+    public function ideas()
+    {
+        return $this->hasMany(Idea::class);
+    }
+
+    public function votes()
+    {
+        return $this->belongsToMany(Idea::class, 'votes');
     }
 }

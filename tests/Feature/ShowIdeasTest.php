@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Idea;
 use App\Models\Status;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -20,17 +21,20 @@ class ShowIdeasTest extends TestCase
         $statusConsidering = Status::factory()->create(['name' => 'Considering']);
         $categoryOne = Category::factory()->create(['name' => 'Category 1']);
         $categoryTwo = Category::factory()->create(['name' => 'Category 2']);
+        $user = User::factory()->create();
         $ideaOne = Idea::factory()->create([
             'title' => 'My First Idea',
             'description' => 'Description of my first idea',
             'category_id' => $categoryOne->id,
             'status_id' => $statusOpen->id,
+            'user_id' => $user->id
         ]);
         $ideaTwo = Idea::factory()->create([
             'title' => 'My Second Idea',
             'description' => 'Description of my second idea',
             'category_id' => $categoryTwo->id,
-            'status_id' => $statusConsidering->id
+            'status_id' => $statusConsidering->id,
+            'user_id' => $user->id
         ]);
 
         $response = $this->get(route('idea.index'));
@@ -57,11 +61,13 @@ class ShowIdeasTest extends TestCase
     {
         $statusConsidering = Status::factory()->create(['name' => 'Considering']);
         $category = Category::factory()->create(['name' => 'Category 1']);
+        $user = User::factory()->create();
         $idea = Idea::factory()->create([
             'title' => 'My First Idea',
             'description' => 'Description of my first idea',
             'category_id' => $category->id,
-            'status_id' => $statusConsidering->id
+            'status_id' => $statusConsidering->id,
+            'user_id' => $user->id
         ]);
 
         $response = $this->get(route('idea.index'));
@@ -85,7 +91,10 @@ class ShowIdeasTest extends TestCase
         Status::factory()->create(['name' => 'Implemented']);
         Status::factory()->create(['name' => 'Closed']);
         Category::factory(4)->create();
-        Idea::factory(Idea::PAGINATION_COUNT + 1)->create();
+        $user = User::factory()->create();
+        Idea::factory(Idea::PAGINATION_COUNT + 1)->create([
+            'user_id' => $user->id
+        ]);
 
         $ideaOne = Idea::find(1);
         $ideaOne->title = 'My First Idea';
@@ -112,17 +121,20 @@ class ShowIdeasTest extends TestCase
         $statusOpen = Status::factory()->create(['name' => 'Open']);
         $categoryOne = Category::factory()->create(['name' => 'Category 1']);
         $categoryTwo = Category::factory()->create(['name' => 'Category 2']);
+        $user = User::factory()->create();
         $ideaOne = Idea::factory()->create([
             'title' => 'My First Idea',
             'description' => 'Description for my first idea',
             'category_id' => $categoryOne->id,
             'status_id' => $statusOpen->id,
+            'user_id' => $user->id
         ]);
         $ideaTwo = Idea::factory()->create([
             'title' => 'My First Idea',
             'description' => 'Another Description for my first idea',
             'category_id' => $categoryTwo->id,
             'status_id' => $statusOpen->id,
+            'user_id' => $user->id
         ]);
 
         $response = $this->get(route('idea.show', $ideaOne));

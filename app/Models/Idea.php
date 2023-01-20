@@ -23,6 +23,9 @@ class Idea extends Model
         ];
     }
 
+    /**
+     * Relationships
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -36,5 +39,10 @@ class Idea extends Model
     public function status()
     {
         return $this->belongsTo(Status::class);
+    }
+
+    public function votes()
+    {
+        return $this->belongsToMany(User::class, 'votes');
     }
 }
