@@ -18,6 +18,24 @@ class IdeaShow extends Component
         $this->hasVoted = $idea->isVotedBy(auth()->user());
     }
 
+    public function vote()
+    {
+        if (!auth()->check()) {
+            return redirect(route('login'));
+        }
+
+        $user = auth()->user();
+        if ($this->hasVoted) {
+            $this->idea->removeVote($user);
+            $this->votesCount--;
+            $this->hasVoted = false;
+        } else {
+            $this->idea->vote($user);
+            $this->votesCount++;
+            $this->hasVoted = true;
+        }
+    }
+
     public function render()
     {
         return view('livewire.idea-show');

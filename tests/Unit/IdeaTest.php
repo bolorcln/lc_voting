@@ -37,4 +37,48 @@ class IdeaTest extends TestCase
         $this->assertFalse($idea->isVotedBy($userTwo));
         $this->assertFalse($idea->isVotedBy(null));
     }
+
+    /** @test */
+    public function user_can_vote_for_idea()
+    {
+        $userOne = User::factory()->create();
+        $userTwo = User::factory()->create();
+        $categoryOne = Category::factory()->create(['name' => 'Category 1']);
+        $statusOpen = Status::factory()->create(['name' => 'Open']);
+        $idea = Idea::factory()->create([
+            'title' => 'My First Idea',
+            'description' => 'Description for my first idea',
+            'user_id' => $userOne->id,
+            'category_id' => $categoryOne->id,
+            'status_id' => $statusOpen->id
+        ]);
+
+        $this->assertFalse($idea->isVotedBy($userOne));
+        $idea->vote($userOne);
+        $this->assertTrue($idea->isVotedBy($userOne));
+    }
+
+    /** @test */
+    public function user_can_unvote_for_idea()
+    {
+        $userOne = User::factory()->create();
+        $userTwo = User::factory()->create();
+        $categoryOne = Category::factory()->create(['name' => 'Category 1']);
+        $statusOpen = Status::factory()->create(['name' => 'Open']);
+        $idea = Idea::factory()->create([
+            'title' => 'My First Idea',
+            'description' => 'Description for my first idea',
+            'user_id' => $userOne->id,
+            'category_id' => $categoryOne->id,
+            'status_id' => $statusOpen->id
+        ]);
+        Vote::factory()->create([
+            'idea_id' => $idea->id,
+            'user_id' => $userOne->id
+        ]);
+
+        $this->assertTrue($idea->isVotedBy($userOne));
+        $idea->removeVote($userOne);
+        $this->assertFalse($idea->isVotedBy($userOne));
+    }
 }

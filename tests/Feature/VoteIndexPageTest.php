@@ -114,4 +114,60 @@ class VoteIndexPageTest extends TestCase
             ])
             ->assertSet('hasVoted', true);
     }
+
+    /** @test */
+    public function user_who_is_not_logged_in_is_redirected_to_login_page_when_trying_to_vote()
+    {
+        $userOne = User::factory()->create();
+        $categoryOne = Category::factory()->create(['name' => 'Category 1']);
+        $statusOpen = Status::factory()->create(['name' => 'Open']);
+        $idea = Idea::factory()->create([
+            'title' => 'My First Idea',
+            'description' => 'Description for my first idea',
+            'user_id' => $userOne->id,
+            'category_id' => $categoryOne->id,
+            'status_id' => $statusOpen->id
+        ]);
+
+        Livewire::test(IdeaIndex::class, [
+            'idea' => $idea,
+            'votesCount' => 1
+        ])
+            ->call('vote')
+            ->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function user_who_is_logged_in_can_vote_for_idea()
+    {
+        $userOne = User::factory()->create();
+        $categoryOne = Category::factory()->create(['name' => 'Category 1']);
+        $statusOpen = Status::factory()->create(['name' => 'Open']);
+        $idea = Idea::factory()->create([
+            'title' => 'My First Idea',
+            'description' => 'Description for my first idea',
+            'user_id' => $userOne->id,
+            'category_id' => $categoryOne->id,
+            'status_id' => $statusOpen->id
+        ]);
+
+        $this->assertDatabaseMissing('votes', [
+            'user_id' => $userOne->id,
+            'idea_id' => $idea->id
+        ]);
+
+        Livewire::actingAs($userOne)
+            ->test(IdeaIndex::class, [
+                'idea' => $idea,
+                'votesCount' => 1
+            ])
+            ->call('vote')
+            ->assertSet('votesCount', 2)
+            ->assertSet('hasVoted', true);
+
+        $this->assertDatabaseHas('votes', [
+            'user_id' => $userOne->id,
+            'idea_id' => $idea->id
+        ]);
+    }
 }
