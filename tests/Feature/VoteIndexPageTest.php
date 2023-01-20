@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Livewire\IdeaIndex;
+use App\Http\Livewire\IdeasIndex;
 use App\Models\Category;
 use App\Models\Idea;
 use App\Models\Status;
@@ -35,7 +36,7 @@ class VoteIndexPageTest extends TestCase
     }
 
     /** @test */
-    public function index_page_correctly_receives_votes_count()
+    public function ideas_index_livewire_component_correctly_receives_votes_count()
     {
         $userOne = User::factory()->create();
         $userTwo = User::factory()->create();
@@ -58,7 +59,7 @@ class VoteIndexPageTest extends TestCase
             'idea_id' => $idea->id
         ]);
 
-        $this->get(route('idea.index'))
+        Livewire::test(IdeasIndex::class)
             ->assertViewHas('ideas', function ($ideas) {
                 return $ideas->first()->votes_count == 2;
             });
@@ -103,14 +104,13 @@ class VoteIndexPageTest extends TestCase
             'idea_id' => $idea->id
         ]);
 
-        $response = $this->actingAs($userOne)->get(route('idea.index'));
-
-        $ideaWithVotes = $response['ideas']->items()[0];
+        $idea->votes_count = 1;
+        $idea->voted_by_user = 1;
 
         Livewire::actingAs($userOne)
             ->test(IdeaIndex::class, [
-                'idea' => $ideaWithVotes,
-                'votesCount' => $ideaWithVotes->votes_count
+                'idea' => $idea,
+                'votesCount' => $idea->votes_count
             ])
             ->assertSet('hasVoted', true);
     }
