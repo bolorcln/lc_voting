@@ -24,6 +24,21 @@ class Idea extends Model
     }
 
     /**
+     * Methods
+     */
+    public function isVotedBy(?User $user)
+    {
+        if (is_null($user)) {
+            return false;
+        }
+
+        return Vote::where([
+            ['user_id', $user->id],
+            ['idea_id', $this->id]
+        ])->exists();
+    }
+
+    /**
      * Relationships
      */
     public function user()

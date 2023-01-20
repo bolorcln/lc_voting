@@ -83,4 +83,30 @@ class VoteShowPageTest extends TestCase
         ])
             ->assertSet('votesCount', 5);
     }
+
+    /** @test */
+    public function user_who_is_logged_in_shows_voted_if_idea_already_voted_for()
+    {
+        $userOne = User::factory()->create();
+        $categoryOne = Category::factory()->create(['name' => 'Category 1']);
+        $statusOpen = Status::factory()->create(['name' => 'Open']);
+        $idea = Idea::factory()->create([
+            'title' => 'My First Idea',
+            'description' => 'Description for my first idea',
+            'user_id' => $userOne->id,
+            'category_id' => $categoryOne->id,
+            'status_id' => $statusOpen->id
+        ]);
+        Vote::factory()->create([
+            'user_id' => $userOne->id,
+            'idea_id' => $idea->id
+        ]);
+
+        Livewire::actingAs($userOne)
+            ->test(IdeaShow::class, [
+                'idea' => $idea,
+                'votesCount' => 1
+            ])
+            ->assertSet('hasVoted', true);
+    }
 }
