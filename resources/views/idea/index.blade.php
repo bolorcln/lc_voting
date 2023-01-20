@@ -79,8 +79,8 @@
 
             <div class="flex items-center space-x-2 mt-4 md:mt-0" x-data="{isOpen: false}">
               <div
-                class="bg-gray-200 text-xxs text-center font-bold uppercase leading-none rounded-full w-28 h-7 py-2 px-4">
-                Open
+                class="status-{{ Str::kebab($idea->status->name) }} text-xxs text-center font-bold uppercase leading-none rounded-full w-28 h-7 py-2 px-4">
+                {{ $idea->status->name }}
               </div>
               <button @click="isOpen = !isOpen"
                 class="relative bg-gray-100 hover:bg-gray-200 border rounded-full h-7 transition duration-150 ease-in px-4">
