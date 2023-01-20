@@ -61,6 +61,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Method
+     */
+    public function isAdmin()
+    {
+        return in_array($this->email, [
+            'bolorcln@gmail.com'
+        ]);
+    }
+
+    /**
      * Relationships
      */
     public function ideas()
