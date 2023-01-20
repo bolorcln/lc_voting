@@ -136,4 +136,45 @@ class ShowIdeasTest extends TestCase
         $response->assertSuccessful();
         $this->assertTrue(request()->path() === 'ideas/my-first-idea-2');
     }
+
+    /** @test */
+    public function in_app_back_button_works_when_index_page_visited_first()
+    {
+        $statusOpen = Status::factory()->create(['name' => 'Open']);
+        $statusConsidering = Status::factory()->create(['name' => 'Considering']);
+        $categoryOne = Category::factory()->create(['name' => 'Category 1']);
+        $categoryTwo = Category::factory()->create(['name' => 'Category 2']);
+        $user = User::factory()->create();
+        $ideaOne = Idea::factory()->create([
+            'title' => 'My First Idea',
+            'description' => 'Description of my first idea',
+            'category_id' => $categoryOne->id,
+            'status_id' => $statusOpen->id,
+            'user_id' => $user->id
+        ]);
+
+        $response = $this->get('/?category=Category%202&status=Considering');
+        $response = $this->get(route('idea.show', $ideaOne));
+        $this->assertStringContainsString('/?category=Category%202&status=Considering', $response['backUrl']);
+    }
+
+    /** @test */
+    public function in_app_back_button_works_when_show_only_page_visited()
+    {
+        $statusOpen = Status::factory()->create(['name' => 'Open']);
+        $statusConsidering = Status::factory()->create(['name' => 'Considering']);
+        $categoryOne = Category::factory()->create(['name' => 'Category 1']);
+        $categoryTwo = Category::factory()->create(['name' => 'Category 2']);
+        $user = User::factory()->create();
+        $ideaOne = Idea::factory()->create([
+            'title' => 'My First Idea',
+            'description' => 'Description of my first idea',
+            'category_id' => $categoryOne->id,
+            'status_id' => $statusOpen->id,
+            'user_id' => $user->id
+        ]);
+
+        $response = $this->get(route('idea.show', $ideaOne));
+        $this->assertEquals(route('idea.index'), $response['backUrl']);
+    }
 }
